@@ -25,7 +25,7 @@ class Breadcrumbs < Middleman::Extension
       if hpage.is_a?(String)
         wrap hpage, wrapper: wrapper
       else
-        wrap link_to(title_helper(hpage), "/#{hpage.path}"), wrapper: wrapper
+        wrap link_to(title_helper(hpage), hpage.url), wrapper: wrapper
       end
     end.join(h separator)
   end
@@ -69,6 +69,8 @@ class Breadcrumbs < Middleman::Extension
     if page.directory_index? && page.path != "index.html"# dont be clever with indexes
       filename = page.url.split("/").last.gsub('%20', ' ').titleize
       return filename.chomp(File.extname(filename))
+    elsif page.try(:data).try(:breadcrumb_title)
+      return page.data.breadcrumb_title # Frontmatter breadcrum title
     elsif page.try(:data).try(:title)
       return page.data.title # Frontmatter title
     elsif match = page.render({:layout => false, :no_images => true}).match(/<h.+>(.*?)<\/h1>/)
